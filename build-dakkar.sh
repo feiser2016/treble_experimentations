@@ -33,23 +33,29 @@ Options:
 
 ROM types:
 
+  aex
+  aicp
+  aokp
+  aosmp
   aosp80
   aosp81
   aosp90
+  aquarios
   carbon
-  e-0.2
+  crdroid
+  e-pie
+  e-oreo
+  havoc
+  komodo
   lineage151
   lineage160
-  rr
+  mokee
   pixel81
   pixel90
-  crdroid
-  mokee
-  aicp
-  aokp
-  aex
+  potato
+  rebellion
+  rr
   slim
-  havoc
 
 Variants are dash-joined combinations of (in order):
 * processor type
@@ -107,10 +113,17 @@ function get_rom_type() {
                 treble_generate="carbon"
                 extra_make_options="WITHOUT_CHECK_API=true"
                 ;;
-            e-0.2)
+            e-pie)
                 mainrepo="https://gitlab.e.foundation/e/os/android/"
-                mainbranch="eelo-0.2"
+                mainbranch="v1-pie"
                 localManifestBranch="android-9.0"
+                treble_generate="lineage"
+                extra_make_options="WITHOUT_CHECK_API=true"
+                ;;
+            e-oreo)
+                mainrepo="https://gitlab.e.foundation/e/os/android/"
+                mainbranch="v1-oreo"
+                localManifestBranch="android-8.1"
                 treble_generate="lineage"
                 extra_make_options="WITHOUT_CHECK_API=true"
                 ;;
@@ -147,6 +160,13 @@ function get_rom_type() {
                 mainbranch="pie"
                 localManifestBranch="android-9.0"
                 treble_generate="pixel"
+                extra_make_options="WITHOUT_CHECK_API=true"
+                ;;
+            potato)
+                mainrepo="https://github.com/PotatoProject/manifest.git"
+                mainbranch="baked-release"
+                localManifestBranch="android-9.0"
+                treble_generate="potato"
                 extra_make_options="WITHOUT_CHECK_API=true"
                 ;;
             crdroid)
@@ -198,7 +218,34 @@ function get_rom_type() {
                 treble_generate="havoc"
                 extra_make_options="WITHOUT_CHECK_API=true"
                 ;;
-        esac
+	   komodo)
+                mainrepo="https://github.com/KomodOS-Rom/platform_manifest.git"
+                mainbranch="pie"
+                localManifestBranch="android-9.0"
+                treble_generate="komodo"
+                extra_make_options="WITHOUT_CHECK_API=true"
+                ;;
+	   rebellion)
+	        mainrepo="https://github.com/RebellionOS/manifest.git"
+		mainbranch="pie"
+		localManifestBranch="android-9.0"
+		treble_generate="rebellion"
+		extra_make_options="WITHOUT_CHECK_API=true"
+		;;
+	  aquarios)
+	        mainrepo="https://github.com/aquarios/manifest.git"
+		mainbranch="a9"
+		localManifestBranch="android-9.0"
+		treble_generate="aquarios"
+		extra_make_options="WITHOUT_CHECK_API=true"
+		;;
+	   aosmp)
+	   	mainrepo="https://gitlab.com/AOSmP/android_manifest.git"
+		mainbranch="pie"
+		localManifestBranch="android-9.0"
+		treble_generate="aosmp"
+		extra_make_options="WITHOUT_CHECK_API=true"
+	esac
         shift
     done
 }
@@ -356,6 +403,11 @@ function jack_env() {
     fi
 }
 
+function clean_build() {
+    make installclean
+    rm -rf "$OUT"
+}
+
 parse_options "$@"
 get_rom_type "$@"
 get_variants "$@"
@@ -389,3 +441,9 @@ jack_env
 for (( idx=0; idx < ${#variant_codes[*]}; idx++ )); do
     build_variant "${variant_codes[$idx]}" "${variant_names[$idx]}"
 done
+
+read -p "Do you want to clean? (y/N) " clean
+
+if [[ $clean == *"y"* ]];then 
+clean_build
+fi
